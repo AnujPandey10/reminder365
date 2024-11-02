@@ -1,0 +1,17 @@
+CREATE TABLE Route (
+    routeID INTEGER NOT NULL ,
+    routeShortName TEXT  NOT NULL,
+    routeLongName TEXT  NOT NULL
+);
+
+insertRoute:
+INSERT INTO Route (routeID, routeShortName, routeLongName)
+VALUES (?, ?, ?);
+
+removeAllRoutes:
+DELETE FROM Route;
+
+selectAllRoutes:
+SELECT Route.*
+FROM Route;
+
