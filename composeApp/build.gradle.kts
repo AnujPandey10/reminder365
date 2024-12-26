@@ -71,7 +71,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.quoders.kmp.bizkaimoves"
+    namespace = "com.quoders.kmp.template"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -79,7 +79,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.quoders.kmp.bizkaimoves"
+        applicationId = "com.quoders.kmp.template"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -110,7 +110,7 @@ android {
 sqldelight {
     databases {
         create("Database") {
-            packageName.set("com.quoders.kmp.bizkaimoves.cache")
+            packageName.set("com.quoders.kmp.template.cache")
         }
     }
 }

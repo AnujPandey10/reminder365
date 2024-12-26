@@ -1,4 +1,4 @@
-rootProject.name = "BizkaiMoves"
+rootProject.name = "kmp-template"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
