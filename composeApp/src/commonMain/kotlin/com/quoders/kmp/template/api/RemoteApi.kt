@@ -5,11 +5,11 @@ import io.ktor.client.request.get
 
 class RemoteApi(private val ktorApi: KtorApi) : KtorApi by ktorApi {
     companion object {
-        const val ROUTES_BASE_URL = "api/routes"
+        const val ALBUMS_BASE_URL = "albums/1/photos"
     }
 
-    suspend fun getRoutes(): List<RouteResponse> = client.get {
-        apiUrl(ROUTES_BASE_URL)
+    suspend fun getAlbums(): List<AlbumsResponse> = client.get {
+        apiUrl(ALBUMS_BASE_URL)
         json()
     }.body()
 }

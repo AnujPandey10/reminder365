@@ -4,6 +4,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun FavoritesScreen() {
-    Text("FavoritesScreen")
+fun Screen3() {
+    Text("Screen3")
 }

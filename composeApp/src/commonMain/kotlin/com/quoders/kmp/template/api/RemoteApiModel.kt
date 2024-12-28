@@ -4,8 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RouteResponse(
-    @SerialName("route_id") val id: Long = 0,
-    @SerialName("route_long_name") val longName: String,
-    @SerialName("route_short_name") val shortName: String,
+data class AlbumsResponse(
+    @SerialName("albumId") val id: Long = 0,
+    @SerialName("id") val albumId: Long = 0,
+    @SerialName("title") val title: String,
+    @SerialName("url") val url: String,
+    @SerialName("thumbnailUrl") val thumbnailUrl: String
 )

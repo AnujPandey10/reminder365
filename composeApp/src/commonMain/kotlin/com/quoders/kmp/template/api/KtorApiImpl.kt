@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 
 class KtorApiImpl : KtorApi {
 
-    private val prodUrl = "https://bizkaibus-api-52b009d032a6.herokuapp.com/"
+    private val prodUrl = "https://jsonplaceholder.typicode.com/"
 
     override val client = HttpClient {
         install(ContentNegotiation) {

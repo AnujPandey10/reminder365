@@ -1,17 +1,18 @@
-CREATE TABLE Route (
-    routeID INTEGER NOT NULL ,
-    routeShortName TEXT  NOT NULL,
-    routeLongName TEXT  NOT NULL
+CREATE TABLE Album (
+    albumId INTEGER NOT NULL ,
+    id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    url TEXT NOT NULL,
+    thumbnailUrl TEXT NOT NULL
 );
 
-insertRoute:
-INSERT INTO Route (routeID, routeShortName, routeLongName)
-VALUES (?, ?, ?);
+insertAlbum:
+INSERT INTO Album (albumId, id, title, url, thumbnailUrl)
+VALUES (?, ?, ?, ?, ?);
 
-removeAllRoutes:
-DELETE FROM Route;
+removeAllAlbums:
+DELETE FROM Album;
 
-selectAllRoutes:
-SELECT Route.*
-FROM Route;
-
+selectAllAlbums:
+SELECT Album.*
+FROM Album;

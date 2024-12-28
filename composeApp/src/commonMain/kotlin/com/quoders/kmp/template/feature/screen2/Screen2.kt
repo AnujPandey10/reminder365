@@ -10,20 +10,20 @@ import org.koin.core.annotation.KoinExperimentalAPI
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun RoutesScreen() {
-    val viewModel: RoutesViewModel = koinViewModel()
+fun Screen2() {
+    val viewModel: Screen2ViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle(
         lifecycleOwner = LocalLifecycleOwner.current
     )
 
-    RoutesContent(state)
+    Screen2Content(state)
 }
 
 @Composable
-fun RoutesContent(state: RoutesModelState) {
+fun Screen2Content(state: Screen2State) {
     when (state) {
-        is RoutesModelState.Loading -> Text("Loading...")
-        is RoutesModelState.Result -> Text("Result: ${state.routes}")
-        is RoutesModelState.Error -> Text("Error: ${state.error}")
+        is Screen2State.Loading -> Text("Loading...")
+        is Screen2State.Result -> Text("Result: ${state.albums}")
+        is Screen2State.Error -> Text("Error: ${state.error}")
     }
 }

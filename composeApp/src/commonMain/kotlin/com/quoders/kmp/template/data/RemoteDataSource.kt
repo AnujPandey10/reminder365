@@ -3,7 +3,7 @@ package com.quoders.kmp.template.data
 import com.quoders.kmp.template.api.RemoteApi
 
 class RemoteDataSource(
-    private val routesApi: RemoteApi
+    private val remoteApi: RemoteApi
 ) {
-    suspend fun getRoutes() = routesApi.getRoutes()
+    suspend fun getAlbums() = remoteApi.getAlbums()
 }

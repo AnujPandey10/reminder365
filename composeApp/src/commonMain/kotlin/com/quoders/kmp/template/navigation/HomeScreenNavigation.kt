@@ -7,7 +7,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    data object AroundMe : Screen("aroundme", "Around me", Icons.Default.Home)
-    data object Routes : Screen("routes", "Routes", Icons.AutoMirrored.Default.List)
-    data object Favorites : Screen("favorites", "Favorites", Icons.Default.Favorite)
+    data object Screen1 : Screen("screen1", "Screen1", Icons.Default.Home)
+    data object Screen2 : Screen("screen2", "Screen2", Icons.AutoMirrored.Default.List)
+    data object Screen3 : Screen("screen3", "Screen3", Icons.Default.Favorite)
 }

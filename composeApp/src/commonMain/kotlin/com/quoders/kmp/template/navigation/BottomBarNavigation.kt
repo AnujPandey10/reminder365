@@ -13,8 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.quoders.kmp.template.feature.screen1.Screen1
-import com.quoders.kmp.template.feature.screen3.FavoritesScreen
-import com.quoders.kmp.template.feature.screen2.RoutesScreen
+import com.quoders.kmp.template.feature.screen2.Screen2
+import com.quoders.kmp.template.feature.screen3.Screen3
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -32,9 +32,9 @@ fun HomeScreenNavigation() {
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        Screen.AroundMe,
-        Screen.Routes,
-        Screen.Favorites
+        Screen.Screen1,
+        Screen.Screen2,
+        Screen.Screen3
     )
 
     BottomNavigation {
@@ -61,7 +61,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
-                        popUpTo(Screen.AroundMe.route) {
+                        popUpTo(Screen.Screen1.route) {
                             saveState = true
                         }
                         launchSingleTop = true
@@ -75,15 +75,15 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun NavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = Screen.AroundMe.route) {
-        composable(Screen.AroundMe.route) {
+    NavHost(navController, startDestination = Screen.Screen1.route) {
+        composable(Screen.Screen1.route) {
             Screen1()
         }
-        composable(Screen.Routes.route) {
-            RoutesScreen()
+        composable(Screen.Screen2.route) {
+            Screen2()
         }
-        composable(Screen.Favorites.route) {
-            FavoritesScreen()
+        composable(Screen.Screen3.route) {
+            Screen3()
         }
     }
 }
