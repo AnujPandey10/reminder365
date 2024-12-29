@@ -6,15 +6,15 @@ import org.koin.core.component.inject
 
 class Repository : KoinComponent {
 
-    private val routesLocalSource: LocalDataSource by inject()
-    private val routesRemoteSource: RemoteDataSource by inject()
+    private val localDataSource: LocalDataSource by inject()
+    private val remoteDataSource: RemoteDataSource by inject()
 
     suspend fun getAlbums(forceRefresh: Boolean = false): List<Album> {
-        val cachedRoutes = routesLocalSource.getRoutes()
-        return if (cachedRoutes.isNotEmpty() && !forceRefresh) {
-            cachedRoutes
+        val cachedAlbums = localDataSource.getAlbums()
+        return if (cachedAlbums.isNotEmpty() && !forceRefresh) {
+            cachedAlbums
         } else {
-            routesRemoteSource.getAlbums().map {
+            remoteDataSource.getAlbums().map {
                 Album(
                     id = it.id,
                     albumId = it.albumId,
@@ -22,8 +22,8 @@ class Repository : KoinComponent {
                     url = it.url,
                     thumbnailUrl = it.thumbnailUrl
                 )
-            }.also { routes ->
-                routesLocalSource.saveRoutes(routes)
+            }.also { albums ->
+                localDataSource.saveAlbums(albums)
             }
         }
     }

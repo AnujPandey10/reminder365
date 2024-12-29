@@ -6,7 +6,7 @@ import com.quoders.kmp.template.api.RemoteApi
 import com.quoders.kmp.template.data.LocalDataSource
 import com.quoders.kmp.template.data.RemoteDataSource
 import com.quoders.kmp.template.data.Repository
-import com.quoders.kmp.template.feature.screen2.Screen2ViewModel
+import com.quoders.kmp.template.feature.screen1.Screen1ViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -34,5 +34,5 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { Screen2ViewModel() }
+    viewModel { Screen1ViewModel() }
 }

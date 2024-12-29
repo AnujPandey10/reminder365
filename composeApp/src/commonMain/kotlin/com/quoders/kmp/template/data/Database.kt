@@ -7,14 +7,14 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = Database(databaseDriverFactory.createDriver())
     private val dbQuery = database.databaseQueries
 
-    internal fun getRoutes(): List<Album> {
+    internal fun getAlbums(): List<Album> {
         return dbQuery.selectAllAlbums(::mapAlbumsSelecting).executeAsList()
     }
 
-    internal fun clearAndCreateAlbums(routes: List<Album>) {
+    internal fun clearAndCreateAlbums(albums: List<Album>) {
         dbQuery.transaction {
             dbQuery.removeAllAlbums()
-            routes.forEach { album ->
+            albums.forEach { album ->
                 dbQuery.insertAlbum(
                     id = album.id,
                     albumId = album.albumId,
