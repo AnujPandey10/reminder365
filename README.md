@@ -1,4 +1,4 @@
-This is a Kotlin Multiplatform template project targeting Android and iOS.
+A Kotlin Multiplatform template project targeting Android and iOS.
 
 It has integrated basic functionalities:
 - Compose Bottom Navigation
@@ -9,7 +9,8 @@ It has integrated basic functionalities:
 And common libraries usually needed in pretty much all apps:
 - Ktor for Http requests.
 - Koin for dependency injection.
-- SqlDelight for local database
+- SqlDelight for local database.
+- Coil for image loading.
   
 
 The modules are:
