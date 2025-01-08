@@ -1,3 +1,5 @@
+ <img alt="Badge" height="20px" src="https://androidweekly.net/issues/issue-656/badge">
+ 
 A Kotlin Multiplatform template project targeting Android and iOS.
 
 It has integrated basic functionalities:
