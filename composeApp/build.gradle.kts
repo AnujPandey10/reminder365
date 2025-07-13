@@ -61,17 +61,20 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.content.negotiation)
 
-           implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.runtime)
+            implementation(compose.materialIconsExtended)
 
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
         }
     }
 }
 
 android {
-    namespace = "com.quoders.kmp.template"
+    namespace = "com.remindme365.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -79,7 +82,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.quoders.kmp.template"
+        applicationId = "com.remindme365.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -110,7 +113,7 @@ android {
 sqldelight {
     databases {
         create("Database") {
-            packageName.set("com.quoders.kmp.template.cache")
+            packageName.set("com.remindme365.app.cache")
         }
     }
 }

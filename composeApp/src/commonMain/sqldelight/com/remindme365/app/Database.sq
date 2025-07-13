@@ -1,0 +1,91 @@
+CREATE TABLE Event (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    date TEXT NOT NULL,
+    type TEXT NOT NULL,
+    relation TEXT NOT NULL,
+    notes TEXT NOT NULL,
+    photoUrl TEXT,
+    email TEXT,
+    notificationTiming TEXT NOT NULL,
+    notificationType TEXT NOT NULL,
+    isActive INTEGER NOT NULL,
+    isRecurring INTEGER NOT NULL,
+    createdAt TEXT NOT NULL
+);
+
+CREATE TABLE Reminder (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    dateTime TEXT NOT NULL,
+    notificationTiming TEXT NOT NULL,
+    notificationType TEXT NOT NULL,
+    isActive INTEGER NOT NULL,
+    isRecurring INTEGER NOT NULL,
+    recurringInterval TEXT,
+    createdAt TEXT NOT NULL
+);
+
+CREATE TABLE UserSettings (
+    id TEXT PRIMARY KEY NOT NULL,
+    defaultNotificationTiming TEXT NOT NULL,
+    defaultNotificationType TEXT NOT NULL,
+    isPremium INTEGER NOT NULL,
+    autoSendWishes INTEGER NOT NULL,
+    multipleEmails TEXT NOT NULL
+);
+
+-- Event queries
+insertEvent:
+INSERT INTO Event (id, name, date, type, relation, notes, photoUrl, email, notificationTiming, notificationType, isActive, isRecurring, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateEvent:
+UPDATE Event SET name = ?, date = ?, type = ?, relation = ?, notes = ?, photoUrl = ?, email = ?, notificationTiming = ?, notificationType = ?, isActive = ?, isRecurring = ?
+WHERE id = ?;
+
+deleteEvent:
+DELETE FROM Event WHERE id = ?;
+
+selectAllEvents:
+SELECT * FROM Event ORDER BY date ASC;
+
+selectActiveEvents:
+SELECT * FROM Event WHERE isActive = 1 ORDER BY date ASC;
+
+selectEventById:
+SELECT * FROM Event WHERE id = ?;
+
+-- Reminder queries
+insertReminder:
+INSERT INTO Reminder (id, title, description, dateTime, notificationTiming, notificationType, isActive, isRecurring, recurringInterval, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateReminder:
+UPDATE Reminder SET title = ?, description = ?, dateTime = ?, notificationTiming = ?, notificationType = ?, isActive = ?, isRecurring = ?, recurringInterval = ?
+WHERE id = ?;
+
+deleteReminder:
+DELETE FROM Reminder WHERE id = ?;
+
+selectAllReminders:
+SELECT * FROM Reminder ORDER BY dateTime ASC;
+
+selectActiveReminders:
+SELECT * FROM Reminder WHERE isActive = 1 ORDER BY dateTime ASC;
+
+selectReminderById:
+SELECT * FROM Reminder WHERE id = ?;
+
+-- UserSettings queries
+insertUserSettings:
+INSERT INTO UserSettings (id, defaultNotificationTiming, defaultNotificationType, isPremium, autoSendWishes, multipleEmails)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateUserSettings:
+UPDATE UserSettings SET defaultNotificationTiming = ?, defaultNotificationType = ?, isPremium = ?, autoSendWishes = ?, multipleEmails = ?
+WHERE id = ?;
+
+selectUserSettings:
+SELECT * FROM UserSettings WHERE id = ?;
