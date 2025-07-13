@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -17,7 +18,7 @@ import com.remindme365.app.data.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.compose.viewmodel.koinViewModel
@@ -25,38 +26,36 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.Color
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterialApi::class)
 @Composable
-fun AddEventScreen(
-    event: Event? = null, // For editing existing event
-    onEventAdded: () -> Unit,
+fun AddReminderScreen(
+    reminder: Reminder? = null, // For editing existing reminder
+    onReminderAdded: () -> Unit,
     onBackPressed: () -> Unit
 ) {
     object : KoinComponent {}.apply {
         val repository: Repository by inject()
-        val homeViewModel: HomeViewModel by inject()
-        var name by remember { mutableStateOf(event?.name ?: "") }
-        var relation by remember { mutableStateOf(event?.relation ?: "") }
-        var notes by remember { mutableStateOf(event?.notes ?: "") }
-        var email by remember { mutableStateOf(event?.email ?: "") }
-        var selectedEventType by remember { mutableStateOf(event?.type ?: EventType.BIRTHDAY) }
-        var selectedNotificationTiming by remember { mutableStateOf(event?.notificationTiming ?: NotificationTiming.ON_DAY) }
-        var selectedNotificationType by remember { mutableStateOf(event?.notificationType ?: NotificationType.APP_POPUP) }
-        var selectedDate by remember { 
+        val remindersViewModel: RemindersViewModel by inject()
+        
+        var title by remember { mutableStateOf(reminder?.title ?: "") }
+        var description by remember { mutableStateOf(reminder?.description ?: "") }
+        var selectedNotificationTiming by remember { mutableStateOf(reminder?.notificationTiming ?: NotificationTiming.ON_DAY) }
+        var selectedNotificationType by remember { mutableStateOf(reminder?.notificationType ?: NotificationType.APP_POPUP) }
+        var selectedDateTime by remember { 
             mutableStateOf(
-                event?.date ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+                reminder?.dateTime ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             ) 
         }
-        var showDatePicker by remember { mutableStateOf(false) }
+        var showDateTimePicker by remember { mutableStateOf(false) }
         var isSaving by remember { mutableStateOf(false) }
-        var isRecurring by remember { mutableStateOf(event?.isRecurring ?: false) }
+        var isRecurring by remember { mutableStateOf(reminder?.isRecurring ?: false) }
+        var selectedRecurringInterval by remember { mutableStateOf(reminder?.recurringInterval ?: RecurringInterval.DAILY) }
 
-        if (showDatePicker) {
-            DatePickerDialog(
-                onDateSelected = { selectedDate = it },
-                onDismiss = { showDatePicker = false }
+        if (showDateTimePicker) {
+            DateTimePickerDialog(
+                onDateTimeSelected = { selectedDateTime = it },
+                onDismiss = { showDateTimePicker = false }
             )
         }
 
@@ -65,7 +64,7 @@ fun AddEventScreen(
                 TopAppBar(
                     title = { 
                         Text(
-                            if (event == null) "Add Event" else "Edit Event", 
+                            if (reminder == null) "Add Reminder" else "Edit Reminder", 
                             fontWeight = FontWeight.Bold
                         ) 
                     },
@@ -79,53 +78,49 @@ fun AddEventScreen(
                     actions = {
                         TextButton(
                             onClick = {
-                                // Save event
+                                // Save reminder
                                 isSaving = true
-                                val eventToSave = if (event == null) {
-                                    // Create new event
-                                    Event(
-                                        name = name,
-                                        date = selectedDate,
-                                        type = selectedEventType,
-                                        relation = relation,
-                                        notes = notes,
-                                        email = email.takeIf { it.isNotEmpty() },
+                                val reminderToSave = if (reminder == null) {
+                                    // Create new reminder
+                                    Reminder(
+                                        title = title,
+                                        description = description,
+                                        dateTime = selectedDateTime,
                                         notificationTiming = selectedNotificationTiming,
                                         notificationType = selectedNotificationType,
-                                        isRecurring = isRecurring
+                                        isRecurring = isRecurring,
+                                        recurringInterval = if (isRecurring) selectedRecurringInterval else null
                                     )
                                 } else {
-                                    // Update existing event
-                                    event.copy(
-                                        name = name,
-                                        date = selectedDate,
-                                        type = selectedEventType,
-                                        relation = relation,
-                                        notes = notes,
-                                        email = email.takeIf { it.isNotEmpty() },
+                                    // Update existing reminder
+                                    reminder.copy(
+                                        title = title,
+                                        description = description,
+                                        dateTime = selectedDateTime,
                                         notificationTiming = selectedNotificationTiming,
                                         notificationType = selectedNotificationType,
-                                        isRecurring = isRecurring
+                                        isRecurring = isRecurring,
+                                        recurringInterval = if (isRecurring) selectedRecurringInterval else null
                                     )
                                 }
                                 
-                                // Save event in a coroutine
+                                // Save reminder in a coroutine
                                 CoroutineScope(Dispatchers.Main).launch {
                                     try {
-                                        if (event == null) {
-                                            repository.saveEvent(eventToSave)
+                                        if (reminder == null) {
+                                            repository.saveReminder(reminderToSave)
                                         } else {
-                                            repository.updateEvent(eventToSave)
+                                            repository.updateReminder(reminderToSave)
                                         }
-                                        homeViewModel.onEventAdded() // Refresh home screen
-                                        onEventAdded()
+                                        remindersViewModel.refresh()
+                                        onReminderAdded()
                                     } catch (e: Exception) {
-                                        // Handle error - you might want to show a snackbar here
+                                        // Handle error
                                         isSaving = false
                                     }
                                 }
                             },
-                            enabled = name.isNotEmpty() && !isSaving
+                            enabled = title.isNotEmpty() && !isSaving
                         ) {
                             Text("Save", color = MaterialTheme.colors.primary)
                         }
@@ -140,118 +135,54 @@ fun AddEventScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                // Event Type Selection
-                Text(
-                    "Event Type",
-                    style = MaterialTheme.typography.h6,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                
-                Row(
+                // Title Field
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") },
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    EventType.values().forEach { eventType ->
-                        FilterChip(
-                            selected = selectedEventType == eventType,
-                            onClick = { selectedEventType = eventType },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = when (eventType) {
-                                        EventType.BIRTHDAY -> Icons.Default.Cake
-                                        EventType.ANNIVERSARY -> Icons.Default.Favorite
-                                        EventType.CUSTOM -> Icons.Default.Event
-                                    },
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        ) {
-                            Text(
-                                eventType.name.lowercase().capitalizeFirst(),
-                                fontSize = 12.sp
-                            )
-                        }
+                    leadingIcon = {
+                        Icon(Icons.Default.Title, contentDescription = null)
                     }
-                }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Description Field
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description (Optional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    maxLines = 5,
+                    leadingIcon = {
+                        Icon(Icons.Default.Description, contentDescription = null)
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Date Selection
+                // Date & Time Selection
                 Text(
-                    "Date",
+                    "Date & Time",
                     style = MaterialTheme.typography.h6,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 
                 OutlinedButton(
-                    onClick = { showDatePicker = true },
+                    onClick = { showDateTimePicker = true },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(
-                        Icons.Default.CalendarToday,
+                        Icons.Default.Schedule,
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text("${selectedDate.month.name.lowercase().capitalizeFirst()} ${selectedDate.dayOfMonth}, ${selectedDate.year}")
+                    Text(formatDateTime(selectedDateTime))
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Name Field
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = {
-                        Icon(Icons.Default.Person, contentDescription = null)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Relation Field
-                OutlinedTextField(
-                    value = relation,
-                    onValueChange = { relation = it },
-                    label = { Text("Relation (Optional)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = {
-                        Icon(Icons.Default.People, contentDescription = null)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Email Field
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email (Optional)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = {
-                        Icon(Icons.Default.Email, contentDescription = null)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Notes Field
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text("Notes (Optional)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 3,
-                    maxLines = 5,
-                    leadingIcon = {
-                        Icon(Icons.Default.Note, contentDescription = null)
-                    }
-                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -281,7 +212,7 @@ fun AddEventScreen(
                         ) {
                             Text(
                                 when (timing) {
-                                    NotificationTiming.ON_DAY -> "On day"
+                                    NotificationTiming.ON_DAY -> "On time"
                                     NotificationTiming.DAY_BEFORE -> "Day before"
                                     NotificationTiming.WEEK_BEFORE -> "Week before"
                                 },
@@ -323,9 +254,9 @@ fun AddEventScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Recurring Event Settings
+                // Recurring Settings
                 Text(
-                    "Recurring Event",
+                    "Recurring Reminder",
                     style = MaterialTheme.typography.h6,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -346,12 +277,12 @@ fun AddEventScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    "Repeat annually",
+                                    "Repeat reminder",
                                     style = MaterialTheme.typography.subtitle1,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    "Get notified every year on this date",
+                                    "Set up recurring notifications",
                                     style = MaterialTheme.typography.body2,
                                     color = Color.Gray
                                 )
@@ -368,21 +299,33 @@ fun AddEventScreen(
                         
                         if (isRecurring) {
                             Spacer(modifier = Modifier.height(12.dp))
+                            
+                            Text(
+                                "Repeat interval:",
+                                style = MaterialTheme.typography.subtitle2,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            
                             Row(
-                                verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(
-                                    Icons.Default.Info,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colors.secondary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    "This event will automatically repeat every year",
-                                    style = MaterialTheme.typography.caption,
-                                    color = MaterialTheme.colors.secondary
-                                )
+                                RecurringInterval.values().forEach { interval ->
+                                    FilterChip(
+                                        selected = selectedRecurringInterval == interval,
+                                        onClick = { selectedRecurringInterval = interval }
+                                    ) {
+                                        Text(
+                                            when (interval) {
+                                                RecurringInterval.DAILY -> "Daily"
+                                                RecurringInterval.WEEKLY -> "Weekly"
+                                                RecurringInterval.MONTHLY -> "Monthly"
+                                                RecurringInterval.YEARLY -> "Yearly"
+                                            },
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -393,54 +336,50 @@ fun AddEventScreen(
                 // Save Button
                 Button(
                     onClick = {
-                        // Save event
+                        // Save reminder
                         isSaving = true
-                        val eventToSave = if (event == null) {
-                            // Create new event
-                            Event(
-                                name = name,
-                                date = selectedDate,
-                                type = selectedEventType,
-                                relation = relation,
-                                notes = notes,
-                                email = email.takeIf { it.isNotEmpty() },
+                        val reminderToSave = if (reminder == null) {
+                            // Create new reminder
+                            Reminder(
+                                title = title,
+                                description = description,
+                                dateTime = selectedDateTime,
                                 notificationTiming = selectedNotificationTiming,
                                 notificationType = selectedNotificationType,
-                                isRecurring = isRecurring
+                                isRecurring = isRecurring,
+                                recurringInterval = if (isRecurring) selectedRecurringInterval else null
                             )
                         } else {
-                            // Update existing event
-                            event.copy(
-                                name = name,
-                                date = selectedDate,
-                                type = selectedEventType,
-                                relation = relation,
-                                notes = notes,
-                                email = email.takeIf { it.isNotEmpty() },
+                            // Update existing reminder
+                            reminder.copy(
+                                title = title,
+                                description = description,
+                                dateTime = selectedDateTime,
                                 notificationTiming = selectedNotificationTiming,
                                 notificationType = selectedNotificationType,
-                                isRecurring = isRecurring
+                                isRecurring = isRecurring,
+                                recurringInterval = if (isRecurring) selectedRecurringInterval else null
                             )
                         }
                         
-                        // Save event in a coroutine
+                        // Save reminder in a coroutine
                         CoroutineScope(Dispatchers.Main).launch {
                             try {
-                                if (event == null) {
-                                    repository.saveEvent(eventToSave)
+                                if (reminder == null) {
+                                    repository.saveReminder(reminderToSave)
                                 } else {
-                                    repository.updateEvent(eventToSave)
+                                    repository.updateReminder(reminderToSave)
                                 }
-                                homeViewModel.onEventAdded() // Refresh home screen
-                                onEventAdded()
+                                remindersViewModel.refresh()
+                                onReminderAdded()
                             } catch (e: Exception) {
-                                // Handle error - you might want to show a snackbar here
+                                // Handle error
                                 isSaving = false
                             }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = name.isNotEmpty() && !isSaving,
+                    enabled = title.isNotEmpty() && !isSaving,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     if (isSaving) {
@@ -455,7 +394,7 @@ fun AddEventScreen(
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(if (event == null) "Save Event" else "Update Event")
+                    Text(if (reminder == null) "Save Reminder" else "Update Reminder")
                 }
             }
         }

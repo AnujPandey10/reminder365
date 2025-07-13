@@ -260,24 +260,32 @@ fun EventsScreen() {
 
     var showAddEvent by remember { mutableStateOf(false) }
     var selectedEvent by remember { mutableStateOf<Event?>(null) }
+    var editingEvent by remember { mutableStateOf<Event?>(null) }
 
     if (selectedEvent != null) {
         EventDetailsScreen(
             event = selectedEvent!!,
             onBackPressed = { selectedEvent = null },
+            onEditEvent = { event -> 
+                editingEvent = event
+                selectedEvent = null
+            },
             onDeleteEvent = { eventId ->
                 viewModel.deleteEvent(eventId)
                 selectedEvent = null
             }
         )
-    } else if (showAddEvent) {
+    } else if (showAddEvent || editingEvent != null) {
         AddEventScreen(
+            event = editingEvent, // Pass the event for editing
             onEventAdded = {
                 showAddEvent = false
+                editingEvent = null
                 viewModel.refresh()
             },
             onBackPressed = {
                 showAddEvent = false
+                editingEvent = null
             }
         )
     } else {
@@ -479,50 +487,83 @@ fun RemindersScreen() {
         lifecycleOwner = LocalLifecycleOwner.current
     )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Reminders", fontWeight = FontWeight.Bold) },
-                backgroundColor = MaterialTheme.colors.surface,
-                elevation = 0.dp,
-                actions = {
-                    IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+    var showAddReminder by remember { mutableStateOf(false) }
+    var selectedReminder by remember { mutableStateOf<Reminder?>(null) }
+    var editingReminder by remember { mutableStateOf<Reminder?>(null) }
+
+    if (selectedReminder != null) {
+        ReminderDetailsScreen(
+            reminder = selectedReminder!!,
+            onBackPressed = { selectedReminder = null },
+            onEditReminder = { reminder -> 
+                editingReminder = reminder
+                selectedReminder = null
+            },
+            onDeleteReminder = { reminderId ->
+                viewModel.deleteReminder(reminderId)
+                selectedReminder = null
+            }
+        )
+    } else if (showAddReminder || editingReminder != null) {
+        AddReminderScreen(
+            reminder = editingReminder, // Pass the reminder for editing
+            onReminderAdded = {
+                showAddReminder = false
+                editingReminder = null
+                viewModel.refresh()
+            },
+            onBackPressed = {
+                showAddReminder = false
+                editingReminder = null
+            }
+        )
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Reminders", fontWeight = FontWeight.Bold) },
+                    backgroundColor = MaterialTheme.colors.surface,
+                    elevation = 0.dp,
+                    actions = {
+                        IconButton(onClick = { viewModel.refresh() }) {
+                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { showAddReminder = true },
+                    backgroundColor = MaterialTheme.colors.primary
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Reminder")
+                }
+            }
+        ) { paddingValues ->
+            when (state) {
+                is RemindersState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO: Add reminder screen */ },
-                backgroundColor = MaterialTheme.colors.primary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Reminder")
-            }
-        }
-    ) { paddingValues ->
-        when (state) {
-            is RemindersState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+                is RemindersState.Success -> {
+                    RemindersContent(
+                        reminders = (state as RemindersState.Success).reminders,
+                        onDeleteReminder = { viewModel.deleteReminder(it) },
+                        onReminderClick = { reminder -> selectedReminder = reminder },
+                        modifier = Modifier.padding(paddingValues)
+                    )
                 }
-            }
-            is RemindersState.Success -> {
-                RemindersContent(
-                    reminders = (state as RemindersState.Success).reminders,
-                    onDeleteReminder = { viewModel.deleteReminder(it) },
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-            is RemindersState.Error -> {
-                ErrorContent(
-                    message = (state as RemindersState.Error).message,
-                    onRetry = { viewModel.refresh() },
-                    modifier = Modifier.padding(paddingValues)
-                )
+                is RemindersState.Error -> {
+                    ErrorContent(
+                        message = (state as RemindersState.Error).message,
+                        onRetry = { viewModel.refresh() },
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                }
             }
         }
     }
@@ -532,6 +573,7 @@ fun RemindersScreen() {
 fun RemindersContent(
     reminders: List<Reminder>,
     onDeleteReminder: (String) -> Unit,
+    onReminderClick: (Reminder) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -552,7 +594,8 @@ fun RemindersContent(
                 items(reminders) { reminder ->
                     ReminderCard(
                         reminder = reminder,
-                        onDelete = { onDeleteReminder(reminder.id) }
+                        onDelete = { onDeleteReminder(reminder.id) },
+                        onClick = { onReminderClick(reminder) }
                     )
                 }
             }
@@ -563,10 +606,13 @@ fun RemindersContent(
 @Composable
 fun ReminderCard(
     reminder: Reminder,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         elevation = 2.dp,
         backgroundColor = MaterialTheme.colors.surface
@@ -602,6 +648,25 @@ fun ReminderCard(
                         color = Color.Gray,
                         maxLines = 2
                     )
+                }
+                if (reminder.isRecurring) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Repeat,
+                            contentDescription = "Recurring",
+                            tint = MaterialTheme.colors.secondary,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            "Repeats ${reminder.recurringInterval?.name?.lowercase() ?: "regularly"}",
+                            style = MaterialTheme.typography.caption,
+                            color = MaterialTheme.colors.secondary
+                        )
+                    }
                 }
             }
 
