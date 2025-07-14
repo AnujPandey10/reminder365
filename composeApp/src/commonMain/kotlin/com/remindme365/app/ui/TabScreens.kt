@@ -316,6 +316,23 @@ fun EventsScreen() {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
+                // Search bar
+                var searchQuery by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        viewModel.search(it)
+                    },
+                    label = { Text("Search Events") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    leadingIcon = {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
+                    }
+                )
+
                 // Event type filter
                 EventTypeFilter(
                     selectedType = selectedEventType,
@@ -540,15 +557,37 @@ fun RemindersScreen() {
                 }
             }
         ) { paddingValues ->
-            when (state) {
-                is RemindersState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // Search bar
+                var searchQuery by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        viewModel.search(it)
+                    },
+                    label = { Text("Search Reminders") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    leadingIcon = {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
                     }
-                }
+                )
+
+                when (state) {
+                    is RemindersState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
                 is RemindersState.Success -> {
                     RemindersContent(
                         reminders = (state as RemindersState.Success).reminders,

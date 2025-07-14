@@ -28,6 +28,8 @@ class EventsViewModel : ViewModel(), KoinComponent {
     private val _selectedEventType = MutableStateFlow(EventType.BIRTHDAY)
     val selectedEventType: StateFlow<EventType> = _selectedEventType
 
+    private var allEvents: List<Event> = emptyList()
+
     init {
         loadEvents()
     }
@@ -36,8 +38,8 @@ class EventsViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             _uiState.value = EventsState.Loading
             try {
-                val events = repository.getActiveEvents()
-                val filteredEvents = events.filter { it.type == _selectedEventType.value }
+                allEvents = repository.getActiveEvents()
+                val filteredEvents = allEvents.filter { it.type == _selectedEventType.value }
                 _uiState.value = EventsState.Success(filteredEvents)
             } catch (e: Exception) {
                 _uiState.value = EventsState.Error(e.message ?: "Unknown error")
@@ -47,7 +49,17 @@ class EventsViewModel : ViewModel(), KoinComponent {
 
     fun selectEventType(eventType: EventType) {
         _selectedEventType.value = eventType
-        loadEvents()
+        val filteredEvents = allEvents.filter { it.type == _selectedEventType.value }
+        _uiState.value = EventsState.Success(filteredEvents)
+    }
+
+    fun search(query: String) {
+        val filteredEvents = allEvents.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                    it.notes.contains(query, ignoreCase = true) ||
+                    it.relation.contains(query, ignoreCase = true)
+        }
+        _uiState.value = EventsState.Success(filteredEvents)
     }
 
     fun deleteEvent(eventId: String) {

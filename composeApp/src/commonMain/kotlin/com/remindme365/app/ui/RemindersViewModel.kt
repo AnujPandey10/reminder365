@@ -23,6 +23,8 @@ class RemindersViewModel : ViewModel(), KoinComponent {
     private val _state = MutableStateFlow<RemindersState>(RemindersState.Loading)
     val state: StateFlow<RemindersState> = _state.asStateFlow()
 
+    private var allReminders: List<Reminder> = emptyList()
+
     init {
         loadReminders()
     }
@@ -31,12 +33,20 @@ class RemindersViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             _state.value = RemindersState.Loading
             try {
-                val reminders = repository.getActiveReminders()
-                _state.value = RemindersState.Success(reminders)
+                allReminders = repository.getActiveReminders()
+                _state.value = RemindersState.Success(allReminders)
             } catch (e: Exception) {
                 _state.value = RemindersState.Error(e.message ?: "Failed to load reminders")
             }
         }
+    }
+
+    fun search(query: String) {
+        val filteredReminders = allReminders.filter {
+            it.title.contains(query, ignoreCase = true) ||
+                    it.description.contains(query, ignoreCase = true)
+        }
+        _state.value = RemindersState.Success(filteredReminders)
     }
 
     fun refresh() {
