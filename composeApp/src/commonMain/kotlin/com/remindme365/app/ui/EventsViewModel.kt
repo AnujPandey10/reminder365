@@ -76,10 +76,94 @@ class EventsViewModel : ViewModel(), KoinComponent {
     fun refresh() {
         loadEvents()
     }
+
+    fun loadContacts() {
+        viewModelScope.launch {
+            try {
+                // This will be resolved at the platform level
+                val contactReader: com.remindme365.app.data.ContactReader by inject()
+                val contacts = contactReader.getContacts()
+                _uiState.value = EventsState.Import(contacts, ImportType.CONTACTS)
+            } catch (e: Exception) {
+                _uiState.value = EventsState.Error(e.message ?: "Failed to load contacts")
+            }
+        }
+    }
+
+    fun loadCalendarEvents() {
+        viewModelScope.launch {
+            try {
+                // This will be resolved at the platform level
+                val calendarReader: com.remindme365.app.data.CalendarReader by inject()
+                val events = calendarReader.getEvents()
+                _uiState.value = EventsState.Import(events, ImportType.CALENDAR)
+            } catch (e: Exception) {
+                _uiState.value = EventsState.Error(e.message ?: "Failed to load calendar events")
+            }
+        }
+    }
+
+    fun importEvents(events: List<Any>) {
+        viewModelScope.launch {
+            try {
+                for (item in events) {
+                    when (item) {
+                        is com.remindme365.app.data.Contact -> {
+                            if (item.birthday != null) {
+                                val event = Event(
+                                    id = item.id,
+                                    name = item.name,
+                                    date = kotlinx.datetime.LocalDate.parse(item.birthday),
+                                    type = EventType.BIRTHDAY,
+                                    relation = "Contact",
+                                    notes = "",
+                                    photoUrl = null,
+                                    email = "",
+                                    notificationTiming = com.remindme365.app.data.NotificationTiming.ON_DAY,
+                                    notificationType = com.remindme365.app.data.NotificationType.APP_POPUP,
+                                    isActive = true,
+                                    isRecurring = true,
+                                    createdAt = kotlinx.datetime.Clock.System.now()
+                                )
+                                repository.addEvent(event)
+                            }
+                        }
+                        is com.remindme365.app.data.CalendarEvent -> {
+                            val event = Event(
+                                id = item.id,
+                                name = item.title,
+                                date = kotlinx.datetime.Instant.fromEpochMilliseconds(item.startDate).toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()).date,
+                                type = EventType.CUSTOM,
+                                relation = "Calendar",
+                                notes = "",
+                                photoUrl = null,
+                                email = "",
+                                notificationTiming = com.remindme365.app.data.NotificationTiming.ON_DAY,
+                                notificationType = com.remindme365.app.data.NotificationType.APP_POPUP,
+                                isActive = true,
+                                isRecurring = false,
+                                createdAt = kotlinx.datetime.Clock.System.now()
+                            )
+                            repository.addEvent(event)
+                        }
+                    }
+                }
+                loadEvents()
+            } catch (e: Exception) {
+                _uiState.value = EventsState.Error(e.message ?: "Failed to import events")
+            }
+        }
+    }
 }
 
 sealed class EventsState {
     data object Loading : EventsState()
     data class Success(val events: List<Event>) : EventsState()
     data class Error(val message: String) : EventsState()
-} 
+    data class Import<T>(val items: List<T>, val type: ImportType) : EventsState()
+}
+
+enum class ImportType {
+    CONTACTS,
+    CALENDAR
+}

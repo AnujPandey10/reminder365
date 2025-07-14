@@ -54,6 +54,12 @@ fun HomeScreen() {
                     backgroundColor = MaterialTheme.colors.surface,
                     elevation = 0.dp,
                     actions = {
+                        IconButton(onClick = { /* TODO: Implement import from contacts */ }) {
+                            Icon(Icons.Default.Contacts, contentDescription = "Import from Contacts")
+                        }
+                        IconButton(onClick = { /* TODO: Implement import from calendar */ }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = "Import from Calendar")
+                        }
                         IconButton(onClick = { viewModel.refresh() }) {
                             Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                         }
@@ -296,6 +302,12 @@ fun EventsScreen() {
                     backgroundColor = MaterialTheme.colors.surface,
                     elevation = 0.dp,
                     actions = {
+                        IconButton(onClick = { viewModel.loadContacts() }) {
+                            Icon(Icons.Default.Contacts, contentDescription = "Import from Contacts")
+                        }
+                        IconButton(onClick = { viewModel.loadCalendarEvents() }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = "Import from Calendar")
+                        }
                         IconButton(onClick = { viewModel.refresh() }) {
                             Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                         }
@@ -359,6 +371,37 @@ fun EventsScreen() {
                         ErrorContent(
                             message = (state as EventsState.Error).message,
                             onRetry = { viewModel.refresh() }
+                        )
+                    }
+                    is EventsState.Import<*> -> {
+                        val importState = state as EventsState.Import<*>
+                        val title = when (importState.type) {
+                            ImportType.CONTACTS -> "Import from Contacts"
+                            ImportType.CALENDAR -> "Import from Calendar"
+                        }
+                        ImportScreen(
+                            items = importState.items,
+                            title = title,
+                            onImport = { viewModel.importEvents(it) },
+                            onBackPressed = { viewModel.refresh() },
+                            itemContent = { item, isSelected, onClick ->
+                                when (item) {
+                                    is Contact -> {
+                                        SelectableItem(
+                                            text = item.name,
+                                            isSelected = isSelected,
+                                            onClick = onClick
+                                        )
+                                    }
+                                    is CalendarEvent -> {
+                                        SelectableItem(
+                                            text = item.title,
+                                            isSelected = isSelected,
+                                            onClick = onClick
+                                        )
+                                    }
+                                }
+                            }
                         )
                     }
                 }
