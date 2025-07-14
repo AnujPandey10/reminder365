@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">रिमाइंडमी365</string>
+    <string name="upcoming_events">आगामी घटनाएँ</string>
+    <string name="import_from_contacts">संपर्कों से आयात करें</string>
+    <string name="import_from_calendar">कैलेंडर से आयात करें</string>
+    <string name="refresh">ताज़ा करें</string>
+    <string name="you_have_events">आपके पास %1$d आगामी घटनाएँ हैं!</string>
+    <string name="next_event">अगला: %1$s का %2$s %3$s को</string>
+    <string name="no_upcoming_events">कोई आगामी घटनाएँ नहीं</string>
+    <string name="add_some_birthdays_and_anniversaries">उन्हें यहाँ देखने के لیے کچھ سالگرہ اور سالگرہ شامل کریں</string>
+    <string name="recurring">आवर्ती</string>
+    <string name="repeats_annually">सालाना दोहराता है</string>
+    <string name="events">आयोजन</string>
+    <string name="add_event">ईवेंट जोड़ें</string>
+    <string name="search_events">ईवेंट खोजें</string>
+    <string name="no_events_found">कोई ईवेंट नहीं मिला</string>
+    <string name="add_some_events">शुरू करने के लिए कुछ ईवेंट जोड़ें</string>
+    <string name="delete">हटाएं</string>
+    <string name="reminders">अनुस्मारक</string>
+    <string name="add_reminder">अनुस्मारक जोड़ें</string>
+    <string name="search_reminders">अनुस्मारक खोजें</string>
+    <string name="no_reminders">कोई अनुस्मारक नहीं</string>
+    <string name="add_some_reminders">शुरू करने के लिए कुछ अनुस्मारक जोड़ें</string>
+    <string name="settings">समायोजन</string>
+    <string name="notification_settings">अधिसूचना सेटिंग्स</string>
+    <string name="configure_notification_preferences">अधिसूचना प्राथमिकताएँ कॉन्फ़िगर करें</string>
+    <string name="sync_settings">सिंक सेटिंग्स</string>
+    <string name="manage_cloud_synchronization">क्लाउड सिंक्रनाइज़ेशन प्रबंधित करें</string>
+    <string name="import_export">आयात/निर्यात</string>
+    <string name="import_from_calendar_or_contacts">कैलेंडर या संपर्कों से आयात करें</string>
+    <string name="premium_features">प्रीमियम सुविधाएँ</string>
+    <string name="upgrade_to_premium">प्रीमियम में अपग्रेड करें</string>
+    <string name="help_support">सहायता और समर्थन</string>
+    <string name="get_help_and_contact_support">सहायता प्राप्त करें और समर्थन से संपर्क करें</string>
+    <string name="error">त्रुटि</string>
+    <string name="retry">पुनः प्रयास करें</string>
+    <string name="today">आज</string>
+    <string name="tomorrow">कल</string>
+    <string name="in_days">%1$d दिनों में</string>
+</resources>
