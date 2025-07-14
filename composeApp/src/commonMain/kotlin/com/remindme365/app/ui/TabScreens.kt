@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,18 +51,18 @@ fun HomeScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Upcoming Events", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.upcoming_events), fontWeight = FontWeight.Bold) },
                     backgroundColor = MaterialTheme.colors.surface,
                     elevation = 0.dp,
                     actions = {
                         IconButton(onClick = { /* TODO: Implement import from contacts */ }) {
-                            Icon(Icons.Default.Contacts, contentDescription = "Import from Contacts")
+                            Icon(Icons.Default.Contacts, contentDescription = stringResource(R.string.import_from_contacts))
                         }
                         IconButton(onClick = { /* TODO: Implement import from calendar */ }) {
-                            Icon(Icons.Default.CalendarToday, contentDescription = "Import from Calendar")
+                            Icon(Icons.Default.CalendarToday, contentDescription = stringResource(R.string.import_from_calendar))
                         }
                         IconButton(onClick = { viewModel.refresh() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
                         }
                     }
                 )
@@ -117,7 +118,7 @@ fun HomeContent(
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    "You have ${events.size} upcoming events!",
+                    stringResource(R.string.you_have_events, events.size),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colors.primary
@@ -126,7 +127,7 @@ fun HomeContent(
                 if (events.isNotEmpty()) {
                     val nextEvent = events.first()
                     Text(
-                        "Next: ${nextEvent.name}'s ${nextEvent.type.name.lowercase()} on ${formatDate(nextEvent.date)}",
+                        stringResource(R.string.next_event, nextEvent.name, nextEvent.type.name.lowercase(), formatDate(nextEvent.date)),
                         fontSize = 14.sp,
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
                     )
@@ -135,7 +136,7 @@ fun HomeContent(
         }
 
         Text(
-            "Upcoming Events",
+            stringResource(R.string.upcoming_events),
             style = MaterialTheme.typography.h6,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -144,8 +145,8 @@ fun HomeContent(
         if (events.isEmpty()) {
             EmptyState(
                 icon = Icons.Default.Event,
-                title = "No upcoming events",
-                message = "Add some birthdays and anniversaries to see them here"
+                title = stringResource(R.string.no_upcoming_events),
+                message = stringResource(R.string.add_some_birthdays_and_anniversaries)
             )
         } else {
             LazyColumn(
@@ -236,13 +237,13 @@ fun EventCard(
                     ) {
                         Icon(
                             Icons.Default.Repeat,
-                            contentDescription = "Recurring",
+                            contentDescription = stringResource(R.string.recurring),
                             tint = MaterialTheme.colors.secondary,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            "Repeats annually",
+                            stringResource(R.string.repeats_annually),
                             style = MaterialTheme.typography.caption,
                             color = MaterialTheme.colors.secondary
                         )
@@ -298,18 +299,18 @@ fun EventsScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Events", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.events), fontWeight = FontWeight.Bold) },
                     backgroundColor = MaterialTheme.colors.surface,
                     elevation = 0.dp,
                     actions = {
                         IconButton(onClick = { viewModel.loadContacts() }) {
-                            Icon(Icons.Default.Contacts, contentDescription = "Import from Contacts")
+                            Icon(Icons.Default.Contacts, contentDescription = stringResource(R.string.import_from_contacts))
                         }
                         IconButton(onClick = { viewModel.loadCalendarEvents() }) {
-                            Icon(Icons.Default.CalendarToday, contentDescription = "Import from Calendar")
+                            Icon(Icons.Default.CalendarToday, contentDescription = stringResource(R.string.import_from_calendar))
                         }
                         IconButton(onClick = { viewModel.refresh() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
                         }
                     }
                 )
@@ -319,7 +320,7 @@ fun EventsScreen() {
                     onClick = { showAddEvent = true },
                     backgroundColor = MaterialTheme.colors.primary
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Event")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
                 }
             }
         ) { paddingValues ->
@@ -336,12 +337,12 @@ fun EventsScreen() {
                         searchQuery = it
                         viewModel.search(it)
                     },
-                    label = { Text("Search Events") },
+                    label = { Text(stringResource(R.string.search_events)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
+                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_events))
                     }
                 )
 
@@ -376,8 +377,8 @@ fun EventsScreen() {
                     is EventsState.Import<*> -> {
                         val importState = state as EventsState.Import<*>
                         val title = when (importState.type) {
-                            ImportType.CONTACTS -> "Import from Contacts"
-                            ImportType.CALENDAR -> "Import from Calendar"
+                            ImportType.CONTACTS -> stringResource(R.string.import_from_contacts)
+                            ImportType.CALENDAR -> stringResource(R.string.import_from_calendar)
                         }
                         ImportScreen(
                             items = importState.items,
@@ -456,8 +457,8 @@ fun EventsContent(
     if (events.isEmpty()) {
         EmptyState(
             icon = Icons.Default.Event,
-            title = "No events found",
-            message = "Add some events to get started"
+            title = stringResource(R.string.no_events_found),
+            message = stringResource(R.string.add_some_events)
         )
     } else {
         LazyColumn(
@@ -531,7 +532,7 @@ fun EventCardWithDelete(
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = Color.Red
                 )
             }
@@ -581,12 +582,12 @@ fun RemindersScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Reminders", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.reminders), fontWeight = FontWeight.Bold) },
                     backgroundColor = MaterialTheme.colors.surface,
                     elevation = 0.dp,
                     actions = {
                         IconButton(onClick = { viewModel.refresh() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh))
                         }
                     }
                 )
@@ -596,7 +597,7 @@ fun RemindersScreen() {
                     onClick = { showAddReminder = true },
                     backgroundColor = MaterialTheme.colors.primary
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Reminder")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_reminder))
                 }
             }
         ) { paddingValues ->
@@ -613,12 +614,12 @@ fun RemindersScreen() {
                         searchQuery = it
                         viewModel.search(it)
                     },
-                    label = { Text("Search Reminders") },
+                    label = { Text(stringResource(R.string.search_reminders)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
+                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_reminders))
                     }
                 )
 
@@ -666,8 +667,8 @@ fun RemindersContent(
         if (reminders.isEmpty()) {
             EmptyState(
                 icon = Icons.Default.Schedule,
-                title = "No reminders",
-                message = "Add some reminders to get started"
+            title = stringResource(R.string.no_reminders),
+            message = stringResource(R.string.add_some_reminders)
             )
         } else {
             LazyColumn(
@@ -755,7 +756,7 @@ fun ReminderCard(
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = Color.Red
                 )
             }
@@ -768,7 +769,7 @@ fun SettingsScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.settings), fontWeight = FontWeight.Bold) },
                 backgroundColor = MaterialTheme.colors.surface,
                 elevation = 0.dp
             )
@@ -781,7 +782,7 @@ fun SettingsScreen() {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
-                "Settings",
+                stringResource(R.string.settings),
                 style = MaterialTheme.typography.h5,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -790,32 +791,32 @@ fun SettingsScreen() {
             // Settings options
             SettingsOption(
                 icon = Icons.Default.Notifications,
-                title = "Notification Settings",
-                subtitle = "Configure notification preferences"
+                title = stringResource(R.string.notification_settings),
+                subtitle = stringResource(R.string.configure_notification_preferences)
             )
 
             SettingsOption(
                 icon = Icons.Default.CloudSync,
-                title = "Sync Settings",
-                subtitle = "Manage cloud synchronization"
+                title = stringResource(R.string.sync_settings),
+                subtitle = stringResource(R.string.manage_cloud_synchronization)
             )
 
             SettingsOption(
                 icon = Icons.Default.ImportExport,
-                title = "Import/Export",
-                subtitle = "Import from calendar or contacts"
+                title = stringResource(R.string.import_export),
+                subtitle = stringResource(R.string.import_from_calendar_or_contacts)
             )
 
             SettingsOption(
                 icon = Icons.Default.Star,
-                title = "Premium Features",
-                subtitle = "Upgrade to premium"
+                title = stringResource(R.string.premium_features),
+                subtitle = stringResource(R.string.upgrade_to_premium)
             )
 
             SettingsOption(
                 icon = Icons.Default.Help,
-                title = "Help & Support",
-                subtitle = "Get help and contact support"
+                title = stringResource(R.string.help_support),
+                subtitle = stringResource(R.string.get_help_and_contact_support)
             )
         }
     }
@@ -930,7 +931,7 @@ fun ErrorContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Error",
+                stringResource(R.string.error),
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold,
                 color = Color.Red
@@ -944,21 +945,22 @@ fun ErrorContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(R.string.retry))
             }
         }
     }
 }
 
 // Utility functions
+@Composable
 fun formatDate(date: LocalDate): String {
     val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val daysUntil = currentDate.daysUntil(date).toLong()
     
     return when {
-        daysUntil == 0L -> "Today"
-        daysUntil == 1L -> "Tomorrow"
-        daysUntil < 7L -> "In $daysUntil days"
+        daysUntil == 0L -> stringResource(R.string.today)
+        daysUntil == 1L -> stringResource(R.string.tomorrow)
+        daysUntil < 7L -> stringResource(R.string.in_days, daysUntil.toInt())
         else -> "${date.month.name.lowercase().capitalizeFirst()} ${date.dayOfMonth}"
     }
 }
